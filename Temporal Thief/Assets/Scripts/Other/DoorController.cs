@@ -10,23 +10,21 @@ public class DoorController : MonoBehaviour
 
     Vector3 closedPos;
     Vector3 openPos;
+    Vector3 targetPos;
     bool isOpen = false;
 
     void Start()
     {
         closedPos = door.localPosition;
         openPos = closedPos + openOffset;
+        targetPos = closedPos;
     }
 
     void Update()
     {
-        if (isOpen)
+        if (door.localPosition != targetPos)
         {
-            door.localPosition = Vector3.MoveTowards(door.localPosition, openPos, speed * Time.deltaTime);
-        }
-        else
-        {
-            door.localPosition = Vector3.MoveTowards(door.localPosition, closedPos, speed * Time.deltaTime);
+            door.localPosition = Vector3.MoveTowards(door.localPosition, targetPos, speed * Time.deltaTime);
         }
     }
 
@@ -38,6 +36,7 @@ public class DoorController : MonoBehaviour
         }
 
         isOpen = true;
+        targetPos = openPos;
     }
 
     public void CloseDoor()
@@ -48,6 +47,7 @@ public class DoorController : MonoBehaviour
         }
 
         isOpen = false;
+        targetPos = closedPos;
     }
 
     public void SetOpen(bool open)
@@ -58,5 +58,6 @@ public class DoorController : MonoBehaviour
         }
 
         isOpen = open;
+        targetPos = isOpen ? openPos : closedPos;
     }
 }

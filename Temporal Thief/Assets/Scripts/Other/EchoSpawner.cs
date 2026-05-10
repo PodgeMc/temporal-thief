@@ -45,6 +45,7 @@ public class EchoSpawner : MonoBehaviour
         }
 
         g.SetRecording(r);
+        g.onFinished = null;
         g.onFinished += x => 
         {
             ghosts.Remove(x);

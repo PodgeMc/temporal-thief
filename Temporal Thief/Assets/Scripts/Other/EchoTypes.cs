@@ -19,7 +19,16 @@ public struct InteractionEvent
 
 public class EchoRecording
 {
-    public List<PoseFrame> frames = new List<PoseFrame>();
-    public List<InteractionEvent> interactions = new List<InteractionEvent>();
+    public List<PoseFrame> frames;
+    public List<InteractionEvent> interactions;
     public float duration = 0f;
+
+    public void EnsureCapacity(int frameCapacity = 0, int interactionCapacity = 0)
+    {
+        if (frames == null)
+            frames = frameCapacity > 0 ? new List<PoseFrame>(frameCapacity) : new List<PoseFrame>();
+
+        if (interactions == null)
+            interactions = interactionCapacity > 0 ? new List<InteractionEvent>(interactionCapacity) : new List<InteractionEvent>();
+    }
 }

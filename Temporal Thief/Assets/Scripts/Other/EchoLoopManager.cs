@@ -61,6 +61,7 @@ public class EchoLoopManager : MonoBehaviour
 
     // Are we currently recording?
     bool isRecording = false;
+    CharacterController playerController;
 
     void Start()
     {
@@ -79,6 +80,8 @@ public class EchoLoopManager : MonoBehaviour
             Debug.LogWarning("[EchoLoopManager] Missing references (recorder / spawner / player).");
             return;
         }
+
+        playerController = player.GetComponent<CharacterController>();
 
         if (spawnPoints == null || spawnPoints.Count == 0)
         {
@@ -176,12 +179,13 @@ public class EchoLoopManager : MonoBehaviour
 
         Transform target = spawnPoints[spawnIndex];
 
-        CharacterController cc = player.GetComponent<CharacterController>();
-        if (cc != null) cc.enabled = false;
+        if (playerController != null)
+            playerController.enabled = false;
 
         player.SetPositionAndRotation(target.position, target.rotation);
 
-        if (cc != null) cc.enabled = true;
+        if (playerController != null)
+            playerController.enabled = true;
 
         Debug.Log("[EchoLoopManager] Player TELEPORTED to spawn index " + spawnIndex +
                   " at position " + player.position);

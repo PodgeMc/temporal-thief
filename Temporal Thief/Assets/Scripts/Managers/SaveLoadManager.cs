@@ -34,11 +34,7 @@ public class SaveLoadManager : MonoBehaviour
 
         if (playerTransform == null)
         {
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null)
-            {
-                playerTransform = player.transform;
-            }
+            playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         }
     }
 

@@ -55,10 +55,21 @@ public class TutorialManager : MonoBehaviour
     {
         if (!waitingForAction) return;
 
-        if (step == 1) CheckLookAround();
-        else if (step == 2) CheckJump();
-        else if (step == 3) CheckWASD();
-        else if (step == 7) CheckEchoKey();
+        switch (step)
+        {
+            case 1:
+                CheckLookAround();
+                break;
+            case 2:
+                CheckJump();
+                break;
+            case 3:
+                CheckWASD();
+                break;
+            case 7:
+                CheckEchoKey();
+                break;
+        }
     }
 
     void ShowStep(int newStep)
@@ -160,7 +171,7 @@ public class TutorialManager : MonoBehaviour
             HidePopup();
             SetObjective("Objective: Exit the room before the door closes.");
             // Advance immediately to completion after a short delay or on exit
-            Invoke("CompleteTutorial", 2f); // Give time to read
+            Invoke(nameof(CompleteTutorial), 2f); // Give time to read
         }
         else if (step == 12)
         {

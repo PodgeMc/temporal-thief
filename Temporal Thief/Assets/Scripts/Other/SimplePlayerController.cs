@@ -15,6 +15,7 @@ public class SimplePlayerController : MonoBehaviour
     // Mouse look settings
     public float mouseSensitivity = 2f;
     public Camera playerCamera;
+    Transform cameraTransform;
 
     // How fast the second W press must happen to count as a double tap
     public float doubleTapTime = 0.25f;
@@ -36,6 +37,7 @@ public class SimplePlayerController : MonoBehaviour
     {
         // Get the CharacterController attached to this object
         controller = GetComponent<CharacterController>();
+        cameraTransform = playerCamera != null ? playerCamera.transform : null;
 
         // Lock the mouse cursor to the screen
         Cursor.lockState = CursorLockMode.Locked;
@@ -61,7 +63,8 @@ public class SimplePlayerController : MonoBehaviour
         cameraPitch -= mouseY;
         cameraPitch = Mathf.Clamp(cameraPitch, -80f, 80f);
 
-        playerCamera.transform.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
+        if (cameraTransform != null)
+            cameraTransform.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
     }
 
     // Detects double-tapping W to activate running
@@ -104,11 +107,11 @@ public class SimplePlayerController : MonoBehaviour
         float x = Input.GetAxis("Horizontal"); // A/D
         float z = Input.GetAxis("Vertical");   // W/S
 
-        // Direction the player should move
         Vector3 move = (transform.right * x + transform.forward * z) * speed;
 
-        // Jumping and gravity
-        if (controller.isGrounded)
+        bool grounded = controller.isGrounded;
+
+        if (grounded)
         {
             verticalVelocity = -1f;
 
@@ -121,8 +124,6 @@ public class SimplePlayerController : MonoBehaviour
         }
 
         move.y = verticalVelocity;
-
-        // Move the player
         controller.Move(move * Time.deltaTime);
     }
 }

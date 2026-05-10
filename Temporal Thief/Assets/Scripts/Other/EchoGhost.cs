@@ -11,8 +11,6 @@ public class EchoGhost : MonoBehaviour
 
     public System.Action<EchoGhost> onFinished;
 
-    private static List<EchoInteractable> _allInteractables;
-
     public void SetRecording(EchoRecording r)
     {
         rec = r;
@@ -77,18 +75,11 @@ public class EchoGhost : MonoBehaviour
 
     void TriggerInteraction(string targetId)
     {
-        if (_allInteractables == null)
-        {
-            _allInteractables = new List<EchoInteractable>(FindObjectsOfType<EchoInteractable>());
-        }
+        if (string.IsNullOrEmpty(targetId)) return;
 
-        foreach (var interactable in _allInteractables)
+        if (EchoInteractable.TryGetInteractable(targetId, out var interactable))
         {
-            if (interactable.interactionId == targetId)
-            {
-                interactable.ReplayUse();
-                return;
-            }
+            interactable.ReplayUse();
         }
     }
 }

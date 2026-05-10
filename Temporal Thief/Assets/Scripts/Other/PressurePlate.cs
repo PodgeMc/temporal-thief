@@ -43,14 +43,11 @@ public class PressurePlate : MonoBehaviour
         RefreshPlate();
     }
 
-    void Update()
-    {
-        // No longer needed, moved to LateUpdate
-    }
-
     void LateUpdate()
     {
-        // cleanup in case something got teleported/destroyed
+        if (activators.Count == 0) return;
+
+        bool changed = false;
         for (int i = activators.Count - 1; i >= 0; i--)
         {
             Collider c = activators[i];
@@ -58,10 +55,12 @@ public class PressurePlate : MonoBehaviour
             if (c == null || !c.gameObject.activeInHierarchy || !IsStillOnPlate(c))
             {
                 activators.RemoveAt(i);
+                changed = true;
             }
         }
 
-        RefreshPlate();
+        if (changed)
+            RefreshPlate();
     }
 
     void RefreshPlate()

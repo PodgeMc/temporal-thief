@@ -19,6 +19,8 @@ public class EchoRecorder : MonoBehaviour
         if (IsRecording) return;
 
         current = new EchoRecording();
+        int estimatedFrameCount = Mathf.Clamp(Mathf.CeilToInt(maxDuration * sampleRate) + 1, 1, maxFrames);
+        current.EnsureCapacity(estimatedFrameCount, 16);
         t = 0;
         timer = 0;
         IsRecording = true;
@@ -30,7 +32,10 @@ public class EchoRecorder : MonoBehaviour
 
         IsRecording = false;
 
-        if (current == null) current = new EchoRecording();
+        if (current == null)
+            current = new EchoRecording();
+
+        current.EnsureCapacity();
 
         if (current.frames.Count == 0 && target != null)
         {

@@ -1,0 +1,4 @@
+{
+    "dotnet.preferCSharpExtension": true,
+    "semgrep.scan.onlyGitDirty": false
+}

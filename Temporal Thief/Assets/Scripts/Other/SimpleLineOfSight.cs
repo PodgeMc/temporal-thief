@@ -30,6 +30,9 @@ public class SimpleLineOfSight : MonoBehaviour
     Transform player;
     bool triggered = false;
 
+    float cosHalfAngleSqr;
+    float previousViewAngle;
+
     public TutorialManager tutorial;
 
     void Start()
@@ -44,7 +47,12 @@ public class SimpleLineOfSight : MonoBehaviour
             tutorial = FindObjectOfType<TutorialManager>();
         }
 
+        UpdateCosineCache();
         FindPlayer();
+        if (player == null)
+        {
+            InvokeRepeating(nameof(FindPlayer), 0.25f, 0.5f);
+        }
 
         // set starting light color
         if (visionLight != null)
@@ -55,13 +63,8 @@ public class SimpleLineOfSight : MonoBehaviour
 
     void Update()
     {
-        if (triggered) return;
-
-        if (!player)
-        {
-            FindPlayer();
+        if (triggered || !player)
             return;
-        }
 
         // draw forward debug line
         if (drawDebug)
@@ -86,8 +89,22 @@ public class SimpleLineOfSight : MonoBehaviour
 
     void FindPlayer()
     {
+        if (player != null) return;
+
         GameObject p = GameObject.FindGameObjectWithTag("Player");
-        if (p) player = p.transform;
+        if (p)
+        {
+            player = p.transform;
+            CancelInvoke(nameof(FindPlayer));
+        }
+    }
+
+    void UpdateCosineCache()
+    {
+        previousViewAngle = viewAngle;
+        float halfAngleRad = viewAngle * 0.5f * Mathf.Deg2Rad;
+        float cosHalfAngle = Mathf.Cos(halfAngleRad);
+        cosHalfAngleSqr = cosHalfAngle * cosHalfAngle;
     }
 
     Vector3 GetOrigin()
@@ -98,16 +115,22 @@ public class SimpleLineOfSight : MonoBehaviour
 
     bool CanSeePlayer()
     {
+        if (viewAngle != previousViewAngle)
+            UpdateCosineCache();
+
         Vector3 origin = GetOrigin();
         Vector3 target = player.position + Vector3.up * 1.2f;
         Vector3 direction = target - origin;
 
-        // distance check
-        if (direction.magnitude > viewDistance)
+        float distSqr = direction.sqrMagnitude;
+        if (distSqr > viewDistance * viewDistance)
             return false;
 
-        // angle check
-        if (Vector3.Angle(transform.forward, direction) > viewAngle / 2f)
+        float forwardDot = Vector3.Dot(transform.forward, direction);
+        if (forwardDot < 0f)
+            return false;
+
+        if (forwardDot * forwardDot < cosHalfAngleSqr * distSqr)
             return false;
 
         // debug line to player
@@ -143,11 +166,6 @@ public class SimpleLineOfSight : MonoBehaviour
         // ============================================
         // TELL TUTORIAL THIS STEP IS COMPLETE
         // ============================================
-        if (tutorial == null)
-        {
-            tutorial = FindObjectOfType<TutorialManager>();
-        }
-
         if (tutorial != null)
         {
             tutorial.EchoCaught();
@@ -155,7 +173,7 @@ public class SimpleLineOfSight : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("SimpleLineOfSight: TutorialManager not found.");
+            Debug.LogWarning("SimpleLineOfSight: TutorialManager not assigned.");
         }
 
         // ============================================
